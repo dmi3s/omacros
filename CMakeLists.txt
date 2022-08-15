@@ -50,3 +50,15 @@ elseif(UNIX)
     target_link_libraries("mtfinder" ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+# DISABLE WITH:  -DBUILD_TESTS=OFF
+option (BUILD_TESTS "Build tests" ON)
+
+if(BUILD_TESTS)
+    set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
+    add_subdirectory(${EXT_PROJECTS_DIR}/gtest)       # GTEST_INCLUDE_DIRS and GTEST_LIBRARIES
+    include_directories(${GTEST_INCLUDE_DIRS})
+    link_directories(${OUTPUT_DIR})
+    add_subdirectory(tests)
+endif()
+
+

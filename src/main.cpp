@@ -37,7 +37,8 @@ namespace {
             return {};
         }
 
-        return optional<mtf_options>({ vm["file_name"].as<string>(), vm["mask"].as<string>() });
+        return optional<mtf_options>({ vm["file_name"].as<string>()
+                                       ,vm["mask"].as<string>() });
     }
 }
 
@@ -51,4 +52,3 @@ int main(int argc, const char* argv[]) {
 
     return 0;    
 }
-
