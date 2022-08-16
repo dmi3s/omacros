@@ -1,8 +1,10 @@
 #include "file_view.hpp"
 #include "utils.hpp"
+#include "fiter.hpp"
 #include <iostream>
 #include <iomanip>
 #include <optional>
+#include <deque>
 #include <boost/program_options.hpp>
 
 namespace {
@@ -47,8 +49,18 @@ namespace {
 
 namespace mtfinder {
 
-    void run(boost::string_view content) {
-        std::cout << content << "<EOF>\n";
+    void run(boost::string_view content, const string& re) {
+        fiter it{content, re};
+        std::deque<fiter_base> results;
+        while (it) {
+            results.push_back(*it);
+            ++it;
+        }
+        std::cout << results.size() << '\n';
+        for (const auto& r : results) {
+            std::cout << r.line + 1 << ' ' << r.offset + 1 << ' '
+                      << r.content << '\n';
+        }
     }
 
 }
@@ -62,7 +74,7 @@ int main(int argc, const char* argv[]) {
         std::cout << opts->file_name << "\t" << opts->mask << "\n";
         try {
             file_view fw{absolutize(opts->file_name).string()};
-            run(fw.get());
+            run(fw.get(), build_regex_string(opts->mask));
         } catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
             return -1;

@@ -5,7 +5,6 @@
 #include "types.hpp"
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <boost/utility/string_view.hpp>
 
 namespace mtfinder {
 
