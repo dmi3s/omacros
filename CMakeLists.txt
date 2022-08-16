@@ -11,7 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 1.80 is the latest version of the boost library at the moment
 # An early version possible works too. Or not.
-find_package(Boost 1.80 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.80 COMPONENTS program_options filesystem REQUIRED)
 
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
@@ -27,9 +27,9 @@ file(GLOB_RECURSE MTFINDER_SRCS
     src/*.hpp
 )
 
-add_executable("mtfinder" ${MTFINDER_SRCS})
-target_sources("mtfinder" PRIVATE ${MTFINDER_SRCS})
-TARGET_LINK_LIBRARIES("mtfinder" LINK_PUBLIC ${Boost_LIBRARIES})
+add_executable(${PROJECT_NAME} ${MTFINDER_SRCS})
+target_sources(${PROJECT_NAME} PRIVATE ${MTFINDER_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} LINK_PUBLIC ${Boost_LIBRARIES})
 
 # OS specific options
 
@@ -38,15 +38,26 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS)
     add_definitions(-D_WIN32_WINNT=0x0A00) # Target is windows 10
-    target_compile_options("ntfinder" PUBLIC "/std:c++latest")
-    target_compile_options("ntfinder" PUBLIC "/wd4714")
-    target_compile_options("ntfinder" PUBLIC "/W4")
-    target_compile_options("ntfinder" PUBLIC "/WX")
-    target_compile_options("ntfinder" PUBLIC "/wd4503")
-    target_compile_options("ntfinder" PUBLIC "/MP")
+    target_compile_options(${PROJECT_NAME} PUBLIC "/std:c++latest")
+    target_compile_options(${PROJECT_NAME} PUBLIC "/wd4714")
+    target_compile_options(${PROJECT_NAME} PUBLIC "/W4")
+    target_compile_options(${PROJECT_NAME} PUBLIC "/WX")
+    target_compile_options(${PROJECT_NAME} PUBLIC "/wd4503")
+    target_compile_options(${PROJECT_NAME} PUBLIC "/MP")
     add_compile_options("$<$<CONFIG:RELASE>:/Zi>")
 elseif(UNIX)
     find_package(Threads)
-    target_link_libraries("mtfinder" ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+# DISABLE WITH:  -DBUILD_TESTS=OFF
+option (BUILD_TESTS "Build tests" ON)
+
+if(BUILD_TESTS)
+    set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
+    add_subdirectory(${EXT_PROJECTS_DIR}/gtest)       # GTEST_INCLUDE_DIRS and GTEST_LIBRARIES
+    include_directories(${GTEST_INCLUDE_DIRS})
+    link_directories(${OUTPUT_DIR})
+    add_subdirectory(tests)
 endif()
 
