@@ -3,16 +3,11 @@
 #include <assert.h>
 
 namespace mtfinder {
-    using std::string;
-    using std::cbegin;
-    using std::cend;
-    using std::distance;
-
     using namespace boost;
 
     fiter::fiter() : skip_eol(false) {}
 
-    fiter::fiter(const boost::string_view& range, const string& regex,
+    fiter::fiter(const string_view& range, const string& regex,
             bool skip_ws) :
         range(range),
         re("\n|" + regex),

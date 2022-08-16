@@ -2,8 +2,6 @@
 #include <vector>
 
 namespace mtfinder {
-    using std::string;
-
 
     string build_regex_string(const string& user_mask) {
         const size_t max_regex_len = user_mask.length() * 2;
@@ -33,7 +31,12 @@ namespace mtfinder {
                     re.push_back(ch);
             }
         }
-        return {std::cbegin(re), std::cend(re)};
+        return {cbegin(re), cend(re)};
+     }
+
+    fs::path absolutize(const fs::path& p) {
+        boost::system::error_code ec;
+        return fs::absolute(p, ec);
     }
 
 }

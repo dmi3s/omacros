@@ -3,7 +3,6 @@
 #include <utility>
 
 using std::pair;
-using std::string;
 using namespace std::string_literals;
 
 using namespace mtfinder;
