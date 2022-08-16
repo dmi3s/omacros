@@ -8,16 +8,23 @@
 
 namespace mtfinder {
 
+    struct fiter_base final {
+        boost::string_view content = {};
+        ptrdiff_t line= 0, offset= 0;
+    };
+
+    bool operator==(const fiter_base& fb1, const fiter_base& fb2);
+
     class fiter final {
     public:
+        fiter();
         fiter(const boost::string_view& range, const std::string& regex);
 
         operator bool() const;
-        size_t line(size_t base = 1) const;
-        size_t offset(size_t base = 1) const;
-        boost::string_view operator*() const;
+        fiter_base operator*() const;
         fiter& operator++();
-        fiter operator++(int);
+        // fiter operator++(int);
+        boost::string_view::const_iterator get_last_end() const;
 
         fiter(const fiter&) = default;
         fiter& operator=(const fiter&) = default;
@@ -29,11 +36,12 @@ namespace mtfinder {
     private:
         const boost::string_view range;
         const boost::regex re;
-        const char* current_line_begin;
-        boost::string_view founded;
-        size_t line_no;
+        fiter_base founded;
+
+        friend bool operator==(const fiter& it1, const fiter& it2);
     };
-    
+
+    bool operator==(const fiter& it1, const fiter& it2);
 }
 
 #endif //!defined(MTFINDER_FITER_HPP)
