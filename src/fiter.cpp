@@ -10,12 +10,14 @@ namespace mtfinder {
 
     using namespace boost;
 
-    fiter::fiter() {}
+    fiter::fiter() : skip_eol(false) {}
 
-    fiter::fiter(const boost::string_view& range, const string& regex) :
+    fiter::fiter(const boost::string_view& range, const string& regex,
+            bool skip_ws) :
         range(range),
         re("\n|" + regex),
-        founded{{cbegin(range), 0}, 0, 0}
+        founded{{cbegin(range), 0}, 0, 0},
+        skip_eol(skip_ws)
     {
         next();
     }
@@ -28,10 +30,11 @@ namespace mtfinder {
             founded.content = { make_string_view(what[0].first, what[0].second) };
             if (founded.content == "\n") {
                 ++founded.line;
+                if (!skip_eol)
+                    return true;
             }
-            else {
+            else
                 return true;
-            }
         }
         founded.content = { cend(founded.content), 0 };
         return false;

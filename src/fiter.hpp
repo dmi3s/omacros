@@ -18,7 +18,8 @@ namespace mtfinder {
     class fiter final {
     public:
         fiter();
-        fiter(const boost::string_view& range, const std::string& regex);
+        fiter(const boost::string_view& range, const std::string& regex,
+            bool skeep_eol = true);
 
         operator bool() const;
         fiter_base operator*() const;
@@ -37,6 +38,7 @@ namespace mtfinder {
         const boost::string_view range;
         const boost::regex re;
         fiter_base founded;
+        const bool skip_eol;
 
         friend bool operator==(const fiter& it1, const fiter& it2);
     };
