@@ -1,10 +1,10 @@
 #include <iostream>
 #include <iomanip>
 #include <optional>
+//#include <regex>
 #include <string>
 #include <string_view>
 #include <boost/program_options.hpp>
-#include <regex>
 
 namespace {
     using std::optional;
@@ -48,21 +48,72 @@ namespace {
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+#include <boost/utility/string_view.hpp>
+#include <boost/system.hpp>
+#include <boost/filesystem.hpp>
 
-namespace bipc = boost::interprocess;
+
+namespace ipc = boost::interprocess;
+namespace fs = boost::filesystem;
+
+namespace mtfinder {
+
+    class file_view final {
+    public:
+        explicit file_view(const std::string& name);
+        boost::string_view get() const;
+        size_t get_page_size() const;
+
+        file_view(const file_view&) = delete;
+        file_view& operator=(const file_view&) = delete;
+    private:
+        boost::interprocess::file_mapping fm;
+        boost::interprocess::mapped_region region;
+    };
+
+}
+
+namespace mtfinder {
+
+    file_view::file_view(const std::string& name) :
+        fm(name.c_str(), boost::interprocess::read_only),
+        region(fm, boost::interprocess::read_only)
+    {}
+
+    boost::string_view file_view::get() const {
+        return {static_cast<const char*>(region.get_address()), region.get_size()};
+    }
+
+    size_t file_view::get_page_size() const {
+        return region.get_page_size();
+    }
+
+    void run(boost::string_view content) {
+        std::cout << content << "<EOF>\n";
+    }
+
+}
 
 
 
 int main(int argc, const char* argv[]) {
 
+    using namespace mtfinder;
+    using namespace std;
+
     if (auto opts = get_options(argc, argv)) {
         std::cout << opts->file_name << "\t" << opts->mask << "\n";
-
-        bipc::file_mapping fm(opts->file_name.c_str(), bipc::read_only);
-        bipc::mapped_region region(fm, bipc::read_only);
-
-        std::cout << "addr = 0x" << std::ios::hex << static_cast<const char*>(region.get_address()) 
-                << std::ios::dec << "\nsz = " << region.get_size();
+        try {
+            cout << fs::current_path() << endl;
+            boost::system::error_code ec;
+            auto abs_name = fs::absolute(opts->file_name,ec).string();
+            cout << abs_name << endl;
+            file_view fw{abs_name};
+            run(fw.get());
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            return -1;
+        }
     } else
         return 1;
 
