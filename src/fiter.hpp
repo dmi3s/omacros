@@ -38,7 +38,7 @@ namespace mtfinder {
         const boost::regex re;
         fiter_base founded;
 
-         friend bool operator==(const fiter& it1, const fiter& it2);
+        friend bool operator==(const fiter& it1, const fiter& it2);
     };
 
     bool operator==(const fiter& it1, const fiter& it2);
