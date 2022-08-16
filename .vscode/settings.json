@@ -5,8 +5,10 @@
     },
     "cmake.debugConfig": {
         "args": [
-            "tests/data/example.txt",
-            "?ad"
+            // "tests/data/Ecclesiastes.txt"
+            "tests/data/example.txt"
+            // , "????king????"
+            , "?ad"
         ]
     }
 }

@@ -51,7 +51,7 @@ namespace mtfinder {
 
     void run(boost::string_view content, const string& re) {
         fiter it{content, re};
-        std::deque<fiter_base> results;
+        std::deque<fiter_data> results;
         while (it) {
             results.push_back(*it);
             ++it;
@@ -74,7 +74,10 @@ int main(int argc, const char* argv[]) {
         std::cout << opts->file_name << "\t" << opts->mask << "\n";
         try {
             file_view fw{absolutize(opts->file_name).string()};
-            run(fw.get(), build_regex_string(opts->mask));
+            std::cout << "Page size: " << fw.get_page_size() << '\n';
+            const auto re = build_regex_string(opts->mask);
+            std::cout << "regex: \'" << re << "\'\n";
+            run(fw.get(), re);
         } catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
             return -1;
