@@ -11,10 +11,9 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include "utils.hpp"
 
 namespace mtfinder {
-
-    std::string build_regex_string(const std::string& user_mask);
 
     class finder {
     public:
@@ -33,57 +32,8 @@ namespace mtfinder {
 
 }
 
-namespace mtfinder {
-
-    using string_view = boost::string_view;
-
-    finder::finder(const char* cbegin, const char* cend
-        , boost::regex re) :
-        cbegin(cbegin), cend(cend), 
-        re(re)
-        {}
-
-    std::string build_regex_string(const std::string& user_mask) {
-        std::string re{"\n|"};
-        for (const auto& ch: user_mask) {
-            std::array<char,3> buf{0};
-            size_t len = 1;
-            switch (ch) {
-                case '?':
-                    buf[0] = '.';
-                    break;
-                case '.':
-                case '(':
-                case ')':
-                case '[':
-                case ']':
-                case '{':
-                case '}':
-                case '|':
-                case '^':
-                case '-':
-                case '*':
-                case '\\':
-                    buf[0] = '\\';
-                    buf[1] = ch;
-                    ++len;
-                    break;
-                default:
-                    buf[0] = ch;
-            }
-            re.append(buf.cbegin(), len);
-        }
-        std::cout << "regex = \"" << re << "\"\n";
-        return re;
-    }
-
-
-    inline string_view make_string_view(const char* b, const char* e) {
-        return string_view(b, std::distance(b, e));
-    }
-}
-
 using namespace mtfinder;
+using boost::string_view;
 
 void dump(const std::vector<string_view>& v) {
     std::cout << "founds: " << v.size() << '\n';
@@ -95,7 +45,7 @@ void dump(const std::vector<string_view>& v) {
 TEST(regex_test, base) {
     // auto expression = boost::regex("(?:'\\n'|.test.)");
     // auto expression = boost::regex("\n|.test\\.");
-    auto expression = boost::regex(
+    auto expression = boost::regex( "\n|" +
         mtfinder::build_regex_string("?test.?([A-Z]*\\)"));
     auto const test_str_view = string_view("this is test. ([A-Z]*\\)\nstring\r\nfor.test. regex\n");
     std::vector<string_view> result;

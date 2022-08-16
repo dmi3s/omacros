@@ -1,13 +1,14 @@
-# cmake_minimum_required(VERSION 3.22)
 enable_testing()
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
+file(GLOB_RECURSE MT_FINDER_SRCS_EXECPT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
+list(REMOVE_ITEM MT_FINDER_SRCS_EXECPT_MAIN ${PROJECT_SOURCE_DIR}/src/main.cpp)
 
-set(MTFINDER_TESTS_SRCS
-	src/main_tests.cpp
-	src/tokenizer_tests.cpp
-	)
+file(GLOB_RECURSE MTFINDER_TESTS_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+	src/*.cpp
+)
+list(APPEND MTFINDER_TESTS_SRCS ${MT_FINDER_SRCS_EXECPT_MAIN})
 
 add_executable(mtfinder_tests ${MTFINDER_TESTS_SRCS})
 
