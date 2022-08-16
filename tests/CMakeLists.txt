@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+# cmake_minimum_required(VERSION 3.22)
 enable_testing()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -6,6 +6,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 set(MTFINDER_TESTS_SRCS
 	src/main_tests.cpp
+	src/tokenizer_tests.cpp
 	)
 
 add_executable(mtfinder_tests ${MTFINDER_TESTS_SRCS})

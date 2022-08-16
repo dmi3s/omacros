@@ -1,7 +1,10 @@
 #include <iostream>
+#include <iomanip>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <boost/program_options.hpp>
+#include <regex>
 
 namespace {
     using std::optional;
@@ -43,11 +46,24 @@ namespace {
 }
 
 
+#include <boost/interprocess/file_mapping.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+
+namespace bipc = boost::interprocess;
+
+
+
 int main(int argc, const char* argv[]) {
 
-    if (auto opts = get_options(argc, argv))
+    if (auto opts = get_options(argc, argv)) {
         std::cout << opts->file_name << "\t" << opts->mask << "\n";
-    else
+
+        bipc::file_mapping fm(opts->file_name.c_str(), bipc::read_only);
+        bipc::mapped_region region(fm, bipc::read_only);
+
+        std::cout << "addr = 0x" << std::ios::hex << static_cast<const char*>(region.get_address()) 
+                << std::ios::dec << "\nsz = " << region.get_size();
+    } else
         return 1;
 
     return 0;    
